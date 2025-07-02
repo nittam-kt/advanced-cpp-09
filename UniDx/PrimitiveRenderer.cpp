@@ -68,7 +68,7 @@ void CubeRenderer::OnEnable()
     submesh->uv = std::span<const Vector2>(uvs, std::size(uvs));
     submesh->normals = std::span<const Vector3>(normals, std::size(normals));
     submesh->topology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-    submesh->createVertexBuffer<VertexPT>();
+    submesh->createBuffer<VertexPT>();
 
     mesh.submesh.push_back(std::move(submesh));
 }

@@ -40,6 +40,9 @@
     <Filter Include="UniDx">
       <UniqueIdentifier>{b6663ce5-6df3-404c-b2e9-6b3a021941af}</UniqueIdentifier>
     </Filter>
+    <Filter Include="tinygltf">
+      <UniqueIdentifier>{a572b3d8-8e7a-459e-810d-3ad05acbc28b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -210,6 +213,24 @@
     <ClInclude Include="..\UniDx\PrimitiveRenderer.h">
       <Filter>UniDx</Filter>
     </ClInclude>
+    <ClInclude Include="..\tinygltf\json.hpp">
+      <Filter>tinygltf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tinygltf\stb_image.h">
+      <Filter>tinygltf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tinygltf\stb_image_write.h">
+      <Filter>tinygltf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tinygltf\tiny_gltf.h">
+      <Filter>tinygltf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\UniDx\GltfRenderer.h">
+      <Filter>UniDx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\UniDx\Material.h">
+      <Filter>UniDx</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\UniDx\Shader.cpp">
@@ -257,6 +278,18 @@
     <ClCompile Include="..\UniDx\PrimitiveRenderer.cpp">
       <Filter>UniDx</Filter>
     </ClCompile>
+    <ClCompile Include="..\tinygltf\tiny_gltf.cc">
+      <Filter>tinygltf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\UniDx\GltfRenderer.cpp">
+      <Filter>UniDx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\UniDx\UniDx.cpp">
+      <Filter>UniDx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\UniDx\Material.cpp">
+      <Filter>UniDx</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="week01.rc">
@@ -273,12 +306,12 @@
     <Image Include="Resource\floor.png">
       <Filter>リソース ファイル</Filter>
     </Image>
+    <Image Include="Resource\ModularCharacterAlbedo.png">
+      <Filter>リソース ファイル</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\UniDx\SpriteShader.hlsl">
-      <Filter>UniDx</Filter>
-    </FxCompile>
-    <FxCompile Include="..\UniDx\Albedo.hlsl">
       <Filter>UniDx</Filter>
     </FxCompile>
     <FxCompile Include="Resource\Albedo.hlsl">
@@ -293,6 +326,9 @@
       <Filter>DirectXTex\include</Filter>
     </None>
     <None Include="Resource\M PLUS 1.spritefont">
+      <Filter>リソース ファイル</Filter>
+    </None>
+    <None Include="Resource\ModularCharacter.glb">
       <Filter>リソース ファイル</Filter>
     </None>
   </ItemGroup>

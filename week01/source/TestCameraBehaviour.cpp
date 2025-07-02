@@ -13,13 +13,13 @@ using namespace UniDx;
 
 void TestCameraBehaviour::OnEnable()
 {
-    transform->localPosition = Vector3(0, 0, -2);
+    transform->localPosition = Vector3(0, 1, -2);
 }
 
 
 void TestCameraBehaviour::Update()
 {
-    const float speed = 0.5f;
+    const float speed = 1;
 
     Vector3 pos = transform->localPosition;
     if (Input::GetKey(Keyboard::A))
@@ -38,5 +38,26 @@ void TestCameraBehaviour::Update()
     {
         pos.y -= speed * Time::deltaTime;
     }
+    if (Input::GetKey(Keyboard::Q))
+    {
+        pos.z += speed * Time::deltaTime;
+    }
+    if (Input::GetKey(Keyboard::E))
+    {
+        pos.z -= speed * Time::deltaTime;
+    }
     transform->localPosition = pos;
+
+    const float angleSpeed = 1.0f;
+    Quaternion localRot = transform->localRotation;
+    Quaternion rot;
+    if (Input::GetKey(Keyboard::J))
+    {
+        rot = Quaternion::CreateFromAxisAngle(Vector3(0, 1, 0), -angleSpeed * Time::deltaTime);
+    }
+    if (Input::GetKey(Keyboard::K))
+    {
+        rot = Quaternion::CreateFromAxisAngle(Vector3(0, 1, 0), angleSpeed * Time::deltaTime);
+    }
+    transform->localRotation = localRot * rot;
 }

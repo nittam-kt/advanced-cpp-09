@@ -8,42 +8,14 @@
 #include "Component.h"
 #include "Shader.h"
 #include "Mesh.h"
+#include "Texture.h"
+#include "Material.h"
 
 
 namespace UniDx {
 
 class Camera;
-class Texture;
-
-// --------------------
-// Materialクラス
-// --------------------
-class Material : public Object
-{
-public:
-    Shader shader;
-    ReadOnlyProperty<Texture*> mainTexture;
-
-    // コンストラクタ
-    Material();
-    Material(VertexType vt, const std::wstring& shPath);
-
-    // シェーダのコンパイル
-    // あらかじめ頂点タイプとシェーダパスを設定して使う
-    bool compileShader();
-
-    // マテリアル情報設定。Render()内で呼び出す
-    void setForRender() const;
-
-    // テクスチャ追加
-    void addTexture(std::unique_ptr<Texture> tex);
-
-protected:
-    ComPtr<ID3D11Buffer> constantBuffer;
-    std::vector<std::unique_ptr<Texture>> textures;
-    VertexType vertexType;
-    std::wstring shaderPath;
-};
+class Material;
 
 
 // --------------------
@@ -55,6 +27,29 @@ public:
     std::vector< std::unique_ptr<Material> > materials;
 
     virtual void Render(const Camera& camera) const {}
+
+    // シェーダー読み込んでマテリアルを追加
+    template<typename TVertex>
+    void addMaterial(const std::wstring& shaderPath)
+    {
+        // マテリアルを追加
+        materials.push_back(std::make_unique<Material>());
+
+        // マテリアルをシェーダーを読み込んで初期化
+        materials.back()->shader.compile<VertexPT>(shaderPath);
+    }
+
+    // シェーダーとテクスチャを読み込んでマテリアルを追加
+    template<typename TVertex>
+    void addMaterial(const std::wstring& shaderPath, const std::wstring& textuePath)
+    {
+        addMaterial(shaderPath);
+
+        // テクスチャを読み込んでマテリアルに追加
+        std::unique_ptr<Texture> t = std::make_unique<Texture>();
+        t->load(textuePath);
+        materials.back()->addTexture(std::move(t));
+    }
 
 protected:
     ComPtr<ID3D11Buffer> constantBuffer0;

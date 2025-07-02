@@ -12,5 +12,6 @@ using Microsoft::WRL::ComPtr;
 namespace UniDx
 {
 
+std::string ToUtf8(const std::wstring& wstr);
 
 }

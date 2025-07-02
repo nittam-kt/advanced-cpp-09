@@ -45,6 +45,10 @@ private:
 	ComPtr<ID3D11DeviceContext>		m_context; // Direct3Dデバイスコンテキスト
 	ComPtr<IDXGISwapChain>			m_swapChain; // スワップチェイン
 	ComPtr<ID3D11RenderTargetView>	m_renderTarget; // バックバッファーのRTビュー
+
+	ComPtr<ID3D11Texture2D> m_depthStencilBuffer; // デプス&ステンシルバッファ
+	ComPtr<ID3D11DepthStencilView> m_depthStencilView;
+	ComPtr<ID3D11DepthStencilState> m_depthStencilState;
 };
 
 } // UniDx

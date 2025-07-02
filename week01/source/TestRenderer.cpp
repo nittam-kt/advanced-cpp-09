@@ -46,7 +46,7 @@ void TestRenderer::OnEnable()
     submesh->positions = position;
     submesh->uv = uv;
     submesh->topology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
-    submesh->createVertexBuffer<VertexPT>();
+    submesh->createBuffer<VertexPT>();
 
     mesh.submesh.push_back(std::move(submesh));
 }

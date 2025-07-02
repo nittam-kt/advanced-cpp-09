@@ -100,15 +100,65 @@ bool D3DManager::Initialize(HWND hWnd, int width, int height)
 	}
 
 	// ----------------------------------------------------------
+	// 深度ステンシルバッファとビューの作成
+	// ----------------------------------------------------------
+	D3D11_TEXTURE2D_DESC depthDesc = {};
+	depthDesc.Width = width;
+	depthDesc.Height = height;
+	depthDesc.MipLevels = 1;
+	depthDesc.ArraySize = 1;
+	depthDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	depthDesc.SampleDesc.Count = 1;
+	depthDesc.SampleDesc.Quality = 0;
+	depthDesc.Usage = D3D11_USAGE_DEFAULT;
+	depthDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+	depthDesc.CPUAccessFlags = 0;
+	depthDesc.MiscFlags = 0;
+
+	if (FAILED(m_device->CreateTexture2D(&depthDesc, nullptr, &m_depthStencilBuffer)))
+	{
+		return false;
+	}
+
+	D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
+	dsvDesc.Format = depthDesc.Format;
+	dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+	dsvDesc.Texture2D.MipSlice = 0;
+
+	if (FAILED(m_device->CreateDepthStencilView(m_depthStencilBuffer.Get(), &dsvDesc, &m_depthStencilView)))
+	{
+		return false;
+	}
+
+	// ----------------------------------------------------------
+	// 深度ステンシルステートの作成
+	// ----------------------------------------------------------
+	D3D11_DEPTH_STENCIL_DESC dsDesc = {};
+	dsDesc.DepthEnable = TRUE; // 深度テスト有効
+	dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	dsDesc.DepthFunc = D3D11_COMPARISON_LESS; // 小さい値が手前
+
+	dsDesc.StencilEnable = FALSE;
+
+	if (FAILED(m_device->CreateDepthStencilState(&dsDesc, &m_depthStencilState)))
+	{
+		return false;
+	}
+
+	// ----------------------------------------------------------
 	// デバイスコンテキストに描画に関する設定を行っておく
 	// ----------------------------------------------------------
 
 	// バックバッファをRTとしてセット
-	m_context->OMSetRenderTargets(1, m_renderTarget.GetAddressOf(), nullptr);
+//	m_context->OMSetRenderTargets(1, m_renderTarget.GetAddressOf(), nullptr);
+	m_context->OMSetRenderTargets(1, m_renderTarget.GetAddressOf(), m_depthStencilView.Get());
 
 	// ビューポートの設定
 	D3D11_VIEWPORT vp = { 0.0f, 0.0f, (float)width, (float)height, 0.0f, 1.0f };
 	m_context->RSSetViewports(1, &vp);
+
+	// 深度ステンシルステートのセット
+	m_context->OMSetDepthStencilState(m_depthStencilState.Get(), 1);
 
 	return true;
 }
@@ -119,7 +169,9 @@ void D3DManager::Clear(float r, float g, float b, float a)
 {
 	const float color[4] = { r, g, b, a };
 	m_context->ClearRenderTargetView(m_renderTarget.Get(), color);
-	m_context->OMSetRenderTargets(1, m_renderTarget.GetAddressOf(), nullptr); // 深度ステンシル未使用
+//	m_context->OMSetRenderTargets(1, m_renderTarget.GetAddressOf(), nullptr); // 深度ステンシル未使用
+	m_context->ClearDepthStencilView(m_depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	m_context->OMSetRenderTargets(1, m_renderTarget.GetAddressOf(), m_depthStencilView.Get());
 }
 
 } // UniDx

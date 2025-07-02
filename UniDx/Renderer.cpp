@@ -5,6 +5,7 @@
 #include "D3DManager.h"
 #include "Texture.h"
 #include "Camera.h"
+#include "Material.h"
 #include "Debug.h"
 
 namespace UniDx{
@@ -22,81 +23,16 @@ struct VSConstantBuffer0
 
 
 // -----------------------------------------------------------------------------
-// コンストラクタ
-// -----------------------------------------------------------------------------
-Material::Material() :
-    Object([this]() { return shader.name; }),
-    mainTexture(
-        [this]() { return textures.size() > 0 ? textures.front().get() : nullptr; }
-    ),
-    vertexType(VertexTypeUnknown)
-{
-}
-
-Material::Material(VertexType vt, const std::wstring& shPath) :
-    Object([this]() { return shader.name; }),
-    mainTexture(
-        [this]() { return textures.size() > 0 ? textures.front().get() : nullptr; }
-    ),
-    vertexType(vt),
-    shaderPath(shPath)
-{
-}
-
-// -----------------------------------------------------------------------------
-// レンダリング用にデバイスへ設定
-// -----------------------------------------------------------------------------
-bool Material::compileShader()
-{
-    switch (vertexType)
-    {
-    case VertexTypeP:
-        return shader.compile<VertexP>(shaderPath);
-    case VertexTypePN:
-        return shader.compile<VertexPN>(shaderPath);
-    case VertexTypePT:
-        return shader.compile<VertexPT>(shaderPath);
-    case VertexTypePC:
-        return shader.compile<VertexPC>(shaderPath);
-    case VertexTypePNT:
-        return shader.compile<VertexPNT>(shaderPath);
-    case VertexTypePNC:
-        return shader.compile<VertexPNC>(shaderPath);
-    case VertexTypeUnknown:
-    default:
-        assert(false);
-        return false;
-    }
-}
-
-
-// -----------------------------------------------------------------------------
-// レンダリング用にデバイスへ設定
-// -----------------------------------------------------------------------------
-void Material::setForRender() const
-{
-    shader.setToContext();
-    for (auto& tex : textures)
-    {
-        tex->setForRender();
-    }
-}
-
-
-// -----------------------------------------------------------------------------
-// テクスチャ追加
-// -----------------------------------------------------------------------------
-void Material::addTexture(std::unique_ptr<Texture> tex)
-{
-    textures.push_back(std::move(tex));
-}
-
-
-// -----------------------------------------------------------------------------
 // 有効化
 // -----------------------------------------------------------------------------
 void Renderer::OnEnable()
 {
+    // マテリアル有効化
+    for (auto& material : materials)
+    {
+        material->OnEnable();
+    }
+
     // 行列用の定数バッファ生成
     D3D11_BUFFER_DESC desc{};
     desc.ByteWidth = sizeof(VSConstantBuffer0);

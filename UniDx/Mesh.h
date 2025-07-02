@@ -23,6 +23,7 @@ class Texture;
 struct SubMesh
 {
     D3D11_PRIMITIVE_TOPOLOGY topology;
+
     std::span<const Vector3> positions;
     std::span<const Vector3> normals;
     std::span<const Color> colors;
@@ -30,7 +31,11 @@ struct SubMesh
     std::span<const Vector2> uv2;
     std::span<const Vector2> uv3;
     std::span<const Vector2> uv4;
-    ComPtr<ID3D11Buffer> buffer;
+    std::span<const uint32_t> indices;
+
+    ComPtr<ID3D11Buffer> vertexBuffer;
+    ComPtr<ID3D11Buffer> indexBuffer;
+
     UINT stride;
 
     template<typename TVertex>
@@ -41,7 +46,7 @@ struct SubMesh
         // 位置のコピー
         for (int i = 0; i < positions.size(); ++i)
         {
-            vertex[i].position = positions[i];
+            vertex[i].setPosition(positions[i]);
         }
         // 法線のコピー
         copyNormalTo(vertex);
@@ -49,16 +54,19 @@ struct SubMesh
         // カラーのコピー
         copyColorTo(vertex);
 
-        // uv0のコピー
-        copyUV0To(vertex);
+        // uvのコピー
+        copyUVTo(vertex);
+        copyUV2To(vertex);
+        copyUV3To(vertex);
+        copyUV4To(vertex);
 
         return positions.size();
     }
 
-    // ID3D11Bufferの頂点バッファを作成
+    // ID3D11Bufferの頂点バッファとインデックスバッファを作成
     // 戻ったバッファは破棄しても良い（DirectX12では仕様が変わる）
     template<typename TVertex>
-    std::unique_ptr< std::vector<TVertex> > createVertexBuffer()
+    std::unique_ptr< std::vector<TVertex> > createBuffer()
     {
         // メモリ上に頂点を確保
         std::unique_ptr < std::vector<TVertex> > buf = std::make_unique< std::vector<TVertex> >();
@@ -69,43 +77,131 @@ struct SubMesh
 
         // ID3D11Buffer を作成
         stride = sizeof(TVertex);
-        createBuffer(&buf->front());
+        createVertexBuffer(&buf->front());
 
+        // インデックスが設定されていればバッファを作成
+        if (indices.size() > 0)
+        {
+            createIndexBuffer();
+        }
         // メモリ上のデータを返す。DirextX11では即座に開放して良い
         return buf;
     }
 
     // GPUにバッファを作成
-    void createBuffer(void* data);
+    void createVertexBuffer(void* data);
+    void createIndexBuffer();
 
     // 描画
     void Render() const;
 
     // 法線のコピー
     template<typename TVertex>
-    void copyNormalTo(std::span<TVertex> vertex) {}
-    template<> void copyNormalTo(std::span<VertexPN> vertex)
-    { assert(normals.size() == positions.size()); for (int i = 0; i < positions.size(); ++i) vertex[i].normal = normals[i]; }
-    template<> void copyNormalTo(std::span<VertexPNT> vertex)
-    { assert(normals.size() == positions.size()); for (int i = 0; i < positions.size(); ++i) vertex[i].normal = normals[i]; }
-    template<> void copyNormalTo(std::span<VertexPNC> vertex)
-    { assert(normals.size() == positions.size()); for (int i = 0; i < positions.size(); ++i) vertex[i].normal = normals[i]; }
+    void copyNormalTo(std::span<TVertex> vertex)
+    {
+        if(normals.size() == 0) return;
+        assert(normals.size() == positions.size());
+        for (int i = 0; i < positions.size(); ++i) vertex[i].setNormal(normals[i]);
+    }
 
     // カラーのコピー
     template<typename TVertex>
-    void copyColorTo(std::span<TVertex> vertex) {}
-    template<> void copyColorTo(std::span<VertexPC> vertex)
-    { assert(colors.size() == positions.size()); for (int i = 0; i < positions.size(); ++i) vertex[i].color = colors[i]; }
-    template<> void copyColorTo(std::span<VertexPNC> vertex)
-    { assert(colors.size() == positions.size()); for (int i = 0; i < positions.size(); ++i) vertex[i].color = colors[i]; }
+    void copyColorTo(std::span<TVertex> vertex)
+    {
+        if(colors.size() == 0) return;
+        assert(colors.size() == positions.size());
+        for (int i = 0; i < positions.size(); ++i) vertex[i].setColor(colors[i]);
+    }
 
-    // UV0のコピー
+    // UVのコピー
     template<typename TVertex>
-    void copyUV0To(std::span<TVertex> vertex) {}
-    template<> void copyUV0To(std::span<VertexPT> vertex)
-    { assert(uv.size() == positions.size()); for (int i = 0; i < positions.size(); ++i) vertex[i].uv0 = uv[i]; }
-    template<> void copyUV0To(std::span<VertexPNT> vertex)
-    { assert(uv.size() == positions.size()); for (int i = 0; i < positions.size(); ++i) vertex[i].uv0 = uv[i]; }
+    void copyUVTo(std::span<TVertex> vertex)
+    {
+        if(uv.size() == 0) return;
+        assert(uv.size() == positions.size());
+        for (int i = 0; i < positions.size(); ++i) vertex[i].setUV(uv[i]);
+    }
+    template<typename TVertex>
+    void copyUV2To(std::span<TVertex> vertex)
+    {
+        if(uv2.size() == 0) return;
+        assert(uv2.size() == positions.size());
+        for (int i = 0; i < positions.size(); ++i) vertex[i].setUV2(uv2[i]);
+    }
+    template<typename TVertex>
+    void copyUV3To(std::span<TVertex> vertex)
+    {
+        if(uv3.size() == 0) return;
+        assert(uv3.size() == positions.size());
+        for (int i = 0; i < positions.size(); ++i) vertex[i].setUV3(uv3[i]);
+    }
+    template<typename TVertex>
+    void copyUV4To(std::span<TVertex> vertex)
+    {
+        if(uv4.size() == 0) return;
+        assert(uv4.size() == positions.size());
+        for (int i = 0; i < positions.size(); ++i) vertex[i].setUV4(uv4[i]);
+    }
+};
+
+
+// --------------------
+// OwnedSubMesh
+// --------------------
+struct OwnedSubMesh : public SubMesh
+{
+    const std::vector<Vector3>& mutablePositions() { return positions_data; }
+    const std::vector<Vector3>& mutableNormals() { return normals_data; }
+    const std::vector<Color>&   mutableColors() { return colors_data; }
+    const std::vector<Vector2>& mutableUV() { return uv_data; }
+    const std::vector<Vector2>& mutableUV2() { return uv2_data; }
+    const std::vector<Vector2>& mutableUV3() { return uv3_data; }
+    const std::vector<Vector2>& mutableUV4() { return uv4_data; }
+    const std::vector<uint32_t>& mutableIndices() { return indices_data; }
+
+    // 必要なサイズだけ確保し、spanを設定
+    void resizePositions(size_t n) {
+        positions_data.resize(n);
+        positions = std::span<const Vector3>(positions_data.data(), n);
+    }
+    void resizeNormals(size_t n) {
+        normals_data.resize(n);
+        normals = std::span<const Vector3>(normals_data.data(), n);
+    }
+    void resizeColors(size_t n) {
+        colors_data.resize(n);
+        colors = std::span<const Color>(colors_data.data(), n);
+    }
+    void resizeUV(size_t n) {
+        uv_data.resize(n);
+        uv = std::span<const Vector2>(uv_data.data(), n);
+    }
+    void resizeUV2(size_t n) {
+        uv2_data.resize(n);
+        uv2 = std::span<const Vector2>(uv2_data.data(), n);
+    }
+    void resizeUV3(size_t n) {
+        uv3_data.resize(n);
+        uv3 = std::span<const Vector2>(uv3_data.data(), n);
+    }
+    void resizeUV4(size_t n) {
+        uv4_data.resize(n);
+        uv4 = std::span<const Vector2>(uv4_data.data(), n);
+    }
+    void resizeIndices(size_t n) {
+        indices_data.resize(n);
+        indices = std::span<const uint32_t>(indices_data.data(), n);
+    }
+
+protected:
+    std::vector<Vector3> positions_data;
+    std::vector<Vector3> normals_data;
+    std::vector<Color> colors_data;
+    std::vector<Vector2> uv_data;
+    std::vector<Vector2> uv2_data;
+    std::vector<Vector2> uv3_data;
+    std::vector<Vector2> uv4_data;
+    std::vector<uint32_t> indices_data;
 };
 
 

@@ -106,7 +106,7 @@
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)DirectXTK\include;$(SolutionDir)DirectXTex\include;$(SolutionDir)Unidx</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)tinygltf;$(SolutionDir)DirectXTK\include;$(SolutionDir)DirectXTex\include;$(SolutionDir)Unidx</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -125,7 +125,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)DirectXTK\include;$(SolutionDir)DirectXTex\include;$(SolutionDir)Unidx</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)tinygltf;$(SolutionDir)DirectXTK\include;$(SolutionDir)DirectXTex\include;$(SolutionDir)Unidx</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -166,6 +166,10 @@
     <ClInclude Include="..\DirectXTK\include\VertexTypes.h" />
     <ClInclude Include="..\DirectXTK\include\WICTextureLoader.h" />
     <ClInclude Include="..\DirectXTK\include\XboxDDSTextureLoader.h" />
+    <ClInclude Include="..\tinygltf\json.hpp" />
+    <ClInclude Include="..\tinygltf\stb_image.h" />
+    <ClInclude Include="..\tinygltf\stb_image_write.h" />
+    <ClInclude Include="..\tinygltf\tiny_gltf.h" />
     <ClInclude Include="..\UniDx\Behaviour.h" />
     <ClInclude Include="..\UniDx\Camera.h" />
     <ClInclude Include="..\UniDx\Component.h" />
@@ -173,7 +177,9 @@
     <ClInclude Include="..\UniDx\Debug.h" />
     <ClInclude Include="..\UniDX\Engine.h" />
     <ClInclude Include="..\UniDx\GameObject.h" />
+    <ClInclude Include="..\UniDx\GltfRenderer.h" />
     <ClInclude Include="..\UniDx\Input.h" />
+    <ClInclude Include="..\UniDx\Material.h" />
     <ClInclude Include="..\UniDx\Mesh.h" />
     <ClInclude Include="..\UniDx\Object.h" />
     <ClInclude Include="..\UniDx\PrimitiveRenderer.h" />
@@ -196,17 +202,21 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\tinygltf\tiny_gltf.cc" />
     <ClCompile Include="..\UniDx\Camera.cpp" />
     <ClCompile Include="..\UniDx\Component.cpp" />
     <ClCompile Include="..\UniDx\D3DManager.cpp" />
     <ClCompile Include="..\UniDX\Engine.cpp" />
+    <ClCompile Include="..\UniDx\GltfRenderer.cpp" />
     <ClCompile Include="..\UniDx\Input.cpp" />
+    <ClCompile Include="..\UniDx\Material.cpp" />
     <ClCompile Include="..\UniDx\Mesh.cpp" />
     <ClCompile Include="..\UniDx\PrimitiveRenderer.cpp" />
     <ClCompile Include="..\UniDx\Renderer.cpp" />
     <ClCompile Include="..\UniDx\Shader.cpp" />
     <ClCompile Include="..\UniDx\Texture.cpp" />
     <ClCompile Include="..\UniDx\Transform.cpp" />
+    <ClCompile Include="..\UniDx\UniDx.cpp" />
     <ClCompile Include="source\CreateDefaultScene.cpp" />
     <ClCompile Include="source\main.cpp" />
     <ClCompile Include="source\TestCameraBehaviour.cpp" />
@@ -217,14 +227,11 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resource\floor.png" />
+    <Image Include="Resource\ModularCharacterAlbedo.png" />
     <Image Include="small.ico" />
     <Image Include="week01.ico" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="..\UniDx\Albedo.hlsl">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </FxCompile>
     <FxCompile Include="..\UniDx\SpriteShader.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
@@ -238,6 +245,7 @@
     <None Include="..\DirectXTex\include\DirectXTex.inl" />
     <None Include="..\DirectXTK\include\SimpleMath.inl" />
     <None Include="Resource\M PLUS 1.spritefont" />
+    <None Include="Resource\ModularCharacter.glb" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="..\DirectXTex\debug_lib\DirectXTex.lib" />
