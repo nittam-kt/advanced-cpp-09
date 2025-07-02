@@ -231,6 +231,9 @@
     <ClInclude Include="..\UniDx\Material.h">
       <Filter>UniDx</Filter>
     </ClInclude>
+    <ClInclude Include="source\SquareThrustRenderer.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\UniDx\Shader.cpp">
@@ -289,6 +292,9 @@
     </ClCompile>
     <ClCompile Include="..\UniDx\Material.cpp">
       <Filter>UniDx</Filter>
+    </ClCompile>
+    <ClCompile Include="source\SquareThrustRenderer.cpp">
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
