@@ -43,7 +43,7 @@ public:
     template<typename TVertex>
     void addMaterial(const std::wstring& shaderPath, const std::wstring& textuePath)
     {
-        addMaterial(shaderPath);
+        addMaterial<TVertex>(shaderPath);
 
         // テクスチャを読み込んでマテリアルに追加
         std::unique_ptr<Texture> t = std::make_unique<Texture>();
